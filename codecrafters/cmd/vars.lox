@@ -1,0 +1,18 @@
+var a;
+var b = 2;
+var a = b = 1;
+print a;
+var quz;
+var hello;
+quz = hello = 16 + 34 * 92;
+print quz;
+print hello;
+var z;
+print z;
+var bar = 99;
+var foo = 99;
+print bar + foo;
+var quz = 99;
+print bar + foo + quz;
+var foo = (8 * (62 + 62)) / 4 + 62;
+print foo;

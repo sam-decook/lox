@@ -1,0 +1,21 @@
+{
+    var foo = "before";
+    print foo;
+}
+{
+    var foo = "after";
+    print foo;
+}
+{
+  var quz = "outer quz";
+  var baz = "outer baz";
+  {
+    quz = "modified quz";
+    var baz = "inner baz";
+    print quz;
+    print baz;
+  }
+  print quz;
+  print baz;
+}
+print baz;

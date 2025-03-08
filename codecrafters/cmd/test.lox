@@ -1,0 +1,22 @@
+var a = "my first variable";
+print "Hello world!";
+5 + "hello"
+"bar" != "world"
+(54 - 67) > -(114 / 57 + 11)
+11 >= 11
+57 > -65
+20 + 74 - (-(14 - 33))
+nil
+"hi" + "lo"
+(10.40 * 2) / 2
+18 * 3 / (3 * 6)
+42 / 5
+91 * 55
+68.040
+!10.4
+!true
+!((false))
+"hello world"
+true
+(72 +)
+5 + 3 * (2 / 4)

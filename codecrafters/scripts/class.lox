@@ -1,0 +1,30 @@
+class Soccer {
+  play() {
+    print("Playing soccer!");
+  }
+  score() {
+    print("Scoring a goal!");
+  }
+  kick() {
+    print("Kicking the ball!");
+  }
+}
+
+print Soccer;
+
+fun foo() {
+  class Superhero {}
+  print "Class declared inside function";
+  print Superhero;
+}
+foo()
+print "Function called successfully";
+
+class Robot {
+  init(model, function) {
+    this.model = model;
+    this.function = function;
+    return;
+  }
+}
+print Robot("R2-D2", "Astromech").model;

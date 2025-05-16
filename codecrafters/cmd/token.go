@@ -111,7 +111,7 @@ type Token struct {
 	Type TokenType
 	// The characters matched from the input
 	Lexeme string
-	// The value which will be used, e.g. 42.0 -> Type: NUMBER, Lexeme: 42, Literal: 42.0
+	// The value which will be used, e.g. 42.0 -> Type: NUMBER, Lexeme: 42.0, Literal: 42
 	Literal string
 	Line    int
 }

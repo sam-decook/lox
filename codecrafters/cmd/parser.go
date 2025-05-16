@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 )
 
 type Parser struct {
@@ -20,6 +21,8 @@ func (p *Parser) program() Program {
 
 func (p *Parser) declaration() Stmt {
 	switch {
+	case p.match(CLASS):
+		return p.classDecl()
 	case p.match(FUN):
 		return p.funDecl()
 	case p.match(VAR):
@@ -27,6 +30,28 @@ func (p *Parser) declaration() Stmt {
 	default:
 		return p.statement()
 	}
+}
+
+func (p *Parser) classDecl() Stmt {
+	name := p.consume(IDENTIFIER, "Expect class name")
+
+	var superclass *VariableExpr
+	if p.match(LESS) {
+		if !p.check(IDENTIFIER) {
+			p.error("Expect superclass name.")
+		}
+		superclass = p.primary().(*VariableExpr)
+	}
+	p.consume(LEFT_BRACE, "Expect '{' before class body")
+
+	methods := []*FunDecl{}
+	for !p.check(RIGHT_BRACE) && !p.atEnd() {
+		methods = append(methods, p.funDecl().(*FunDecl))
+	}
+
+	p.consume(RIGHT_BRACE, "Expect '}' after class body")
+
+	return &ClassDecl{name.Lexeme, superclass, methods}
 }
 
 func (p *Parser) funDecl() Stmt {
@@ -98,11 +123,7 @@ func (p *Parser) printStmt() Stmt {
 func (p *Parser) returnStmt() Stmt {
 	key := p.previous()
 	if p.match(SEMICOLON) {
-		// It's a ghost nil! 👻
-		return &ReturnStmt{key, &LiteralExpr{
-			token: Token{Type: NIL, Line: key.Line},
-			value: "nil"},
-		}
+		return &ReturnStmt{key, nil}
 	} else {
 		expr := p.expression()
 		p.consume(SEMICOLON, "Expected ';' after return value")
@@ -174,7 +195,7 @@ func forToWhile(initializer Stmt, condition Expr, increment Expr, body Stmt) Stm
 
 	// Now, turn the body into a while loop
 	if condition == nil {
-		condition = &LiteralExpr{token: Token{Type: TRUE, Lexeme: "true"}}
+		condition = &LiteralExpr{token: Token{Type: TRUE, Lexeme: "true", Literal: "true"}}
 	}
 	while := &WhileStmt{condition, whileBody}
 
@@ -211,12 +232,14 @@ func (p *Parser) assignment() Expr {
 		// equals := p.previous() // I think for reporting an error
 		value := p.assignment() // ugh it's recursive
 
-		ve, ok := expr.(*VariableExpr)
-		if !ok {
-			p.error("Invalid assignment target")
+		if ve, ok := expr.(*VariableExpr); ok {
+			return &AssignmentExpr{name: ve.name.Lexeme, expr: value}
+		}
+		if ge, ok := expr.(*GetExpr); ok {
+			return &SetExpr{object: ge.object, name: ge.name.Lexeme, value: value}
 		}
 
-		return &AssignmentExpr{name: ve.name.Lexeme, expr: value}
+		p.error("Invalid assignment target")
 	}
 
 	return expr
@@ -328,14 +351,16 @@ func (p *Parser) call() Expr {
 	expr := p.primary()
 
 	for {
-		if p.match(LEFT_PAREN) {
+		switch {
+		case p.match(DOT):
+			name := p.consume(IDENTIFIER, "Expected property name after '.'")
+			expr = &GetExpr{object: expr, name: name}
+		case p.match(LEFT_PAREN):
 			expr = p.arguments(expr)
-		} else {
-			break
+		default:
+			return expr
 		}
 	}
-
-	return expr
 }
 
 func (p *Parser) arguments(callee Expr) Expr {
@@ -374,6 +399,13 @@ func (p *Parser) primary() Expr {
 	case p.match(IDENTIFIER):
 		// TODO: maybe VariableExpr should be renamed to IdentifierExpr
 		return &VariableExpr{name: p.previous()}
+	case p.match(THIS):
+		return &ThisExpr{keyword: p.previous()}
+	case p.match(SUPER):
+		keyword := p.previous()
+		p.consume(DOT, "Expect '.' after 'super'.")
+		method := p.consume(IDENTIFIER, "Expect superclass method name.")
+		return &SuperExpr{keyword, method}
 	default:
 		p.error("Expected an expression")
 	}
@@ -386,11 +418,9 @@ func (p *Parser) primary() Expr {
 
 // Check if any of the types match the current token type, advances if true.
 func (p *Parser) match(types ...TokenType) bool {
-	for _, typ := range types {
-		if p.check(typ) {
-			p.advance()
-			return true
-		}
+	if slices.ContainsFunc(types, p.check) {
+		p.advance()
+		return true
 	}
 	return false
 }

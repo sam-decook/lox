@@ -15,7 +15,7 @@ func main() {
 	filename := os.Args[2]
 
 	lox := Interpreter{}
-	lox.Scan(filename)
+	lexicalError := lox.Scan(filename)
 
 	switch command {
 	case "tokenize":
@@ -28,10 +28,12 @@ func main() {
 		fmt.Println(lox.ast.String())
 
 	case "evaluate":
-		// Evaluate is a special case, since it only parses an expression
-		lox.parser.tokens = lox.tokens
-		ast := lox.parser.expression()
-		res := ast.Evaluate(&lox.env)
+		// Evaluate is a special case, since it only parses expressions
+		parser := Parser{}
+		parser.tokens = lox.tokens
+		ast := parser.expression()
+		res := ast.Evaluate(&lox)
+		// This check might be old, now that I'm using Objects
 		if res == nil {
 			fmt.Println("nil")
 		} else {
@@ -40,6 +42,7 @@ func main() {
 
 	case "run":
 		lox.Parse()
+		lox.Resolve()
 		lox.Evaluate()
 
 	default:
@@ -47,7 +50,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if lox.scanner.lexicalError {
+	if lexicalError {
 		os.Exit(65)
 	}
 }

@@ -1,6 +1,10 @@
 // Implements this BNF:
 // program        → declaration* EOF ;
-// declaration    → funDecl | varDecl | statement ;
+// declaration    → classDecl
+//                | funDecl
+//                | varDecl
+//                | statement ;
+// classDecl      → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}" ;
 // funDecl        → "fun" function ;
 // function       → IDENTIFIER "(" parameters? ")" block ;
 // parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
@@ -13,9 +17,7 @@
 //                | whileStmt
 //                | block ;
 // exprStmt       → expression ";" ;
-// forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
-//                  expression? ";"
-//                  expression? ")" statement ;
+// forStmt        → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 // ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
 // printStmt      → "print" expression ";" ;
 // returnStmt     → "return" expression? ";" ;
@@ -23,7 +25,8 @@
 // block          → "{" declaration* "}" ;
 //
 // expression     → assignment ;
-// assignment     → IDENTIFIER "=" assignment | logic_or ;
+// assignment     → ( call "." )? IDENTIFIER "=" assignment
+//                | logic_or ;
 // logic_or       → logic_and ( "or" logic_and )* ;
 // logic_and      → equality ( "and" equality )* ;
 // equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -31,11 +34,10 @@
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → unary ( ( "/" | "*" ) unary )* ;
 // unary          → ( "!" | "-" ) unary | call ;
-// call           → primary ( "(" arguments? ")" )* ;
+// call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 // arguments      → expression ( "," expression )* ;
-// primary        → NUMBER | STRING | "true" | "false" | "nil"
-//                | "(" expression ")"
-//                | IDENTIFIER;
+// primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
+//                | IDENTIFIER | "super" "." IDENTIFIER ;
 
 package main
 
@@ -45,7 +47,11 @@ import (
 )
 
 type Stmt interface {
-	Run(env *Environment) (retVal Object, ret bool)
+	ASTNode
+	// `ret` is true if there was a return statement, and `retVal` holds the `Object`
+	//
+	// This is useful for distinguishing between a nil return and a LoxNil return.
+	Run(lox *Interpreter) (retVal Object, ret bool)
 	String() string
 }
 
@@ -61,7 +67,26 @@ func (p *Program) String() string {
 	return sb.String()
 }
 
-// Technically this is a function, we are combining it with assigning it to a variable
+type ClassDecl struct {
+	name       string
+	superclass *VariableExpr
+	methods    []*FunDecl
+}
+
+func (cd *ClassDecl) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("class " + cd.name)
+	if cd.superclass != nil {
+		sb.WriteString("< " + cd.superclass.name.Lexeme)
+	}
+	sb.WriteString(" {\n")
+	for _, method := range cd.methods {
+		sb.WriteString("\t" + method.String() + "\n")
+	}
+	sb.WriteString("}")
+	return sb.String()
+}
+
 type FunDecl struct {
 	name   string
 	params []Token
@@ -84,21 +109,6 @@ func (fd *FunDecl) String() string {
 	return sb.String()
 }
 
-type Block struct {
-	decls []Stmt
-}
-
-// TODO: add indentation based on depth using a variable
-func (b *Block) String() string {
-	sb := strings.Builder{}
-	sb.WriteString("{\n")
-	for _, decl := range b.decls {
-		sb.WriteString("    " + decl.String() + "\n")
-	}
-	sb.WriteByte('}')
-	return sb.String()
-}
-
 type VarDecl struct {
 	name string
 	expr Expr
@@ -115,6 +125,16 @@ func (vd *VarDecl) String() string {
 	return sb.String()
 }
 
+type ExprStmt struct {
+	expr Expr
+}
+
+func (es *ExprStmt) String() string {
+	return es.expr.String()
+}
+
+// For statements de-sugar into while statements
+
 type IfStmt struct {
 	condition  Expr
 	thenBranch Stmt
@@ -129,55 +149,6 @@ func (is *IfStmt) String() string {
 		sb.WriteString("else " + is.elseBranch.String())
 	}
 	return sb.String()
-}
-
-type WhileStmt struct {
-	condition Expr
-	body      Stmt
-}
-
-func (ws *WhileStmt) String() string {
-	return fmt.Sprintf("while (%s) %s", ws.condition, ws.body)
-}
-
-type ForStmt struct {
-	initializer Stmt
-	condition   Expr
-	increment   Expr
-	body        Stmt
-}
-
-func (fs *ForStmt) String() string {
-	sb := strings.Builder{}
-
-	sb.WriteString("for (")
-
-	if fs.initializer != nil {
-		sb.WriteString(fs.initializer.String())
-	}
-	sb.WriteString(";")
-
-	if fs.condition != nil {
-		sb.WriteString(fs.condition.String())
-	}
-	sb.WriteString(";")
-
-	if fs.increment != nil {
-		sb.WriteString(fs.increment.String())
-	}
-	sb.WriteString(") ")
-
-	sb.WriteString(fs.body.String())
-
-	return sb.String()
-}
-
-type ExprStmt struct {
-	expr Expr
-}
-
-func (es *ExprStmt) String() string {
-	return es.expr.String()
 }
 
 type PrintStmt struct {
@@ -201,8 +172,33 @@ func (rs *ReturnStmt) String() string {
 	return str
 }
 
+type WhileStmt struct {
+	condition Expr
+	body      Stmt
+}
+
+func (ws *WhileStmt) String() string {
+	return fmt.Sprintf("while (%s) %s", ws.condition, ws.body)
+}
+
+type Block struct {
+	decls []Stmt
+}
+
+// TODO: add indentation based on depth using a variable
+func (b *Block) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("{\n")
+	for _, decl := range b.decls {
+		sb.WriteString("    " + decl.String() + "\n")
+	}
+	sb.WriteByte('}')
+	return sb.String()
+}
+
 type Expr interface {
-	Evaluate(env *Environment) Object
+	ASTNode
+	Evaluate(lox *Interpreter) Object
 	String() string
 }
 
@@ -213,6 +209,24 @@ type AssignmentExpr struct {
 
 func (ae *AssignmentExpr) String() string {
 	return fmt.Sprintf("%s = %s", ae.name, ae.expr)
+}
+
+type SetExpr struct {
+	object Expr
+	name   string
+	value  Expr
+}
+
+func (se *SetExpr) String() string {
+	return fmt.Sprintf("%s.%s = %s", se.object, se.name, se.value)
+}
+
+type ThisExpr struct {
+	keyword Token
+}
+
+func (te *ThisExpr) String() string {
+	return fmt.Sprintf("this")
 }
 
 type LogicOrExpr struct {
@@ -233,6 +247,16 @@ type LogicAndExpr struct {
 
 func (lae *LogicAndExpr) String() string {
 	return fmt.Sprintf("(%s %s %s)", lae.op.Lexeme, lae.left, lae.right)
+}
+
+type BinaryExpr struct {
+	left  Expr
+	op    Token
+	right Expr
+}
+
+func (be *BinaryExpr) String() string {
+	return fmt.Sprintf("(%s %s %s)", be.op.Lexeme, be.left, be.right)
 }
 
 type UnaryExpr struct {
@@ -264,22 +288,13 @@ func (ce *CallExpr) String() string {
 	return sb.String()
 }
 
-type BinaryExpr struct {
-	left  Expr
-	op    Token
-	right Expr
+type GetExpr struct {
+	object Expr
+	name   Token
 }
 
-func (be *BinaryExpr) String() string {
-	return fmt.Sprintf("(%s %s %s)", be.op.Lexeme, be.left, be.right)
-}
-
-type GroupExpr struct {
-	group Expr
-}
-
-func (ge *GroupExpr) String() string {
-	return fmt.Sprintf("(group %s)", ge.group)
+func (ge *GetExpr) String() string {
+	return fmt.Sprintf("%s.%s", ge.object, ge.name.Lexeme)
 }
 
 type LiteralExpr struct {
@@ -291,10 +306,27 @@ func (le *LiteralExpr) String() string {
 	return le.value
 }
 
+type GroupExpr struct {
+	group Expr
+}
+
+func (ge *GroupExpr) String() string {
+	return fmt.Sprintf("(group %s)", ge.group)
+}
+
 type VariableExpr struct {
 	name Token
 }
 
 func (ve *VariableExpr) String() string {
 	return ve.name.Lexeme
+}
+
+type SuperExpr struct {
+	keyword,
+	method Token
+}
+
+func (se *SuperExpr) String() string {
+	return fmt.Sprintf("%s.%s", se.keyword, se.method)
 }

@@ -5,25 +5,25 @@ type Environment struct {
 	values map[string]Object
 }
 
-func NewEnvironment(parent *Environment) Environment {
-	return Environment{
+func NewEnvironment(parent *Environment) *Environment {
+	return &Environment{
 		parent: parent,
 		values: make(map[string]Object, 11),
 	}
 }
 
-func (e *Environment) Define(name string, value Object) {
+func (e *Environment) Define(name string, obj Object) {
 	// Overwrite if it already exists
 	// Nice for a REPL (you don't want to mentally track every declaration)
 	// Might hide accidental redeclarations, and be better to make users
 	// assign the variable a new value instead
-	e.values[name] = value
+	e.values[name] = obj
 }
 
-func (e *Environment) Assign(name string, value Object) {
+func (e *Environment) Assign(name string, obj Object) {
 	for env := e; env != nil; env = env.parent {
 		if _, found := env.values[name]; found {
-			env.values[name] = value
+			env.values[name] = obj
 			return
 		}
 	}
@@ -39,4 +39,12 @@ func (e Environment) Get(name string) Object {
 		runtimeError("Undefined variable: " + name)
 	}
 	return value
+}
+
+func (e Environment) Ancestor(distance int) *Environment {
+	env := &e
+	for range distance {
+		env = env.parent
+	}
+	return env
 }

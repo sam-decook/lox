@@ -1,0 +1,8 @@
+{
+    var j = 0;
+    print "Got this far";
+    while (j < 1) {
+        print "Hello";
+        j = j + 1;
+    }
+}

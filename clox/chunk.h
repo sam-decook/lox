@@ -1,0 +1,40 @@
+#ifndef clox_chunk_h
+#define clox_chunk_h
+
+#include "common.h"
+#include "value.h"
+
+typedef enum {
+    OP_CONSTANT,
+    OP_RETURN,
+} OpCode;
+
+typedef struct {
+    int count;
+    int capacity;
+    uint8_t* code;
+    int* lines;
+    ValueArray constants;
+} Chunk;
+
+void initChunk(Chunk *chunk);
+void writeChunk(Chunk* chunk, uint8_t byte, int line);
+int addConstant(Chunk* chunk, Value value);
+void freeChunk(Chunk* chunk);
+
+#endif
+
+/* Challenges:
+ * Instead of storing the line number for each instruction (many instructions
+ * will have the same line number), develop a compressed encoding and
+ * implement a getLine() function. Sacrifice a bit of speed during decomp for
+ * less memory usage overall.
+ * - array of first instruction number to use a line
+ * - array of that line number (wait, necessary?)
+ *   - no for one-file programs (index + 1 = line number)
+ * - binary search the first array (heck, a linear scan might be fast enough)
+ *
+ * OP_CONSTANT uses one byte for its operand, allowing only 256 constants. That
+ * should be enough for most programs, but not all. Make a new OP_CONSTANT_LONG
+ * instruction that stores it in 3 bytes (24 bits, 4 bytes in total).
+ */

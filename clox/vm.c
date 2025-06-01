@@ -4,6 +4,7 @@
 #include "common.h"
 #include "debug.h"
 #include "vm.h"
+#include "compiler.h"
 
 VM vm;
 // a static VM instance since it's easier for the book.
@@ -54,24 +55,21 @@ static InterpretResult run() {
 
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
-            case OP_CONSTANT: {
+            case OP_CONSTANT:
                 Value constant = READ_CONSTANT();
                 push(constant);
                 break;
-            }
             case OP_ADD:      BINARY_OP(+); break;
             case OP_SUBTRACT: BINARY_OP(-); break;
             case OP_MULTIPLY: BINARY_OP(*); break;
             case OP_DIVIDE:   BINARY_OP(/); break;
-            case OP_NEGATE: {
+            case OP_NEGATE:
                 push(-pop());
                 break;
-            }
-            case OP_RETURN: {
+            case OP_RETURN:
                 printValue(pop());
                 printf("\n");
                 return INTERPRET_OK;
-            }
         }
     }
 
@@ -80,8 +78,7 @@ static InterpretResult run() {
 #undef READ_BYTE
 }
 
-InterpretResult interpret(Chunk* chunk) {
-    vm.chunk = chunk;
-    vm.ip = chunk->code;
-    return run();
+InterpretResult interpret(const char* source) {
+    compile(source);
+    return INTERPRET_OK;
 }

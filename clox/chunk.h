@@ -6,10 +6,17 @@
 
 typedef enum {
     OP_CONSTANT,
+    OP_NIL,
+    OP_TRUE,
+    OP_FALSE,
+    OP_EQUAL,
+    OP_GREATER,
+    OP_LESS,
     OP_ADD,
     OP_SUBTRACT,
     OP_MULTIPLY,
     OP_DIVIDE,
+    OP_NOT,
     OP_NEGATE,
     OP_RETURN,
 } OpCode;
@@ -42,4 +49,9 @@ void freeChunk(Chunk* chunk);
  * OP_CONSTANT uses one byte for its operand, allowing only 256 constants. That
  * should be enough for most programs, but not all. Make a new OP_CONSTANT_LONG
  * instruction that stores it in 3 bytes (24 bits, 4 bytes in total).
+ *
+ * What other binary operators could we eliminate to make our bytecode simpler?
+ *
+ * Conversely, we can speed up our VM by adding more instructions, e.g. a
+ * dedicated greater_than_or_equal.
  */

@@ -1,7 +1,4 @@
 #!/bin/zsh
 
-echo "Compiling..."
-clang -o clox_interpreter *.c -Wall -Wextra
-echo
-echo "Running..."
+clang -o clox_interpreter *.c -Wall -Wextra | less
 ./clox_interpreter $1

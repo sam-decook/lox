@@ -26,8 +26,11 @@ typedef enum {
     OBJ_UPVALUE,
 } ObjType;
 
+extern const char* ObjTypeName[];
+
 struct Obj {
     ObjType type;
+    bool isMarked;
     struct Obj* next;
 };
 

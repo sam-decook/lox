@@ -573,7 +573,7 @@ static void super_(bool canAssign) {
         uint8_t argCount = argumentList();
         namedVariable(syntheticToken("super"), false);
         emitBytes(OP_SUPER_INVOKE, name);
-        emitBytes(argCount);
+        emitByte(argCount);
     } else {
         namedVariable(syntheticToken("super"), false);
         emitBytes(OP_GET_SUPER, name);

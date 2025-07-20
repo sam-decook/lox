@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "[line 259] Error at 'a': Can't have more than 255 arguments.\n",
+  "exit_code": 65,
+  "duration": 1501084
+}

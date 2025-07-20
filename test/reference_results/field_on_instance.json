@@ -1,0 +1,6 @@
+{
+  "stdout": "bar value\nbaz value\nbar value\nbaz value\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 1414750
+}

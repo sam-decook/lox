@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "[line 1] Error at 'return': Can't return from top-level code.\n",
+  "exit_code": 65,
+  "duration": 1479125
+}

@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "Undefined property 'doesNotExist'.\n[line 5] in foo()\n[line 9] in script\n",
+  "exit_code": 70,
+  "duration": 1584166
+}

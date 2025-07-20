@@ -1,0 +1,6 @@
+{
+  "stdout": "Outer instance\nOuter instance\nInner instance\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 1508750
+}

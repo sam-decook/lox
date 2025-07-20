@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "Undefined variable 'isOdd'.\n[line 4] in isEven()\n[line 12] in script\n",
+  "exit_code": 70,
+  "duration": 1457167
+}

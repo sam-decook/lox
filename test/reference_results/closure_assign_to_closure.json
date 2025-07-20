@@ -1,0 +1,6 @@
+{
+  "stdout": "local\nafter f\nafter f\nafter g\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 1366959
+}

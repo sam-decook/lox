@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "Stack overflow.\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 18] in foo()\n[line 21] in script\n",
+  "exit_code": 70,
+  "duration": 1491333
+}

@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "[line 2] Error at 'Foo': A class can't inherit from itself.\n[line 5] Error at end: Expect '}' after block.\n",
+  "exit_code": 65,
+  "duration": 1515625
+}

@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "[line 3] Error at 'return': Can't return a value from an initializer.\n",
+  "exit_code": 65,
+  "duration": 1478625
+}

@@ -1,0 +1,6 @@
+{
+  "stdout": "\u003cfn foo\u003e\n\u003cnative fn\u003e\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 1563792
+}

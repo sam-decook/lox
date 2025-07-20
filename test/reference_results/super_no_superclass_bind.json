@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "[line 3] Error at 'super': Can't use 'super' in a class with no superclass.\n",
+  "exit_code": 65,
+  "duration": 1615584
+}

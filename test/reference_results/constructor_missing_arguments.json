@@ -1,0 +1,6 @@
+{
+  "stdout": "",
+  "stderr": "Expected 2 arguments but got 1.\n[line 5] in script\n",
+  "exit_code": 70,
+  "duration": 1518792
+}

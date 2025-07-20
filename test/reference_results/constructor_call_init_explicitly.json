@@ -1,0 +1,6 @@
+{
+  "stdout": "Foo.init(one)\nFoo.init(two)\nFoo instance\ninit\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 1462208
+}

@@ -1,0 +1,6 @@
+{
+  "stdout": "Derived.init()\nBase.init(a, b)\n",
+  "stderr": "",
+  "exit_code": 0,
+  "duration": 2337875
+}

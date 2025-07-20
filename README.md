@@ -16,3 +16,6 @@ CodeCrafters, or use the test suite included with the book. Also on the list
 I will likely just work on the test suite, because I plan to follow the book's bytecode
 interpreter, to get some experience with writing C, and then port that to Zig to try out that
 language. So one test suite for all three projects would be very useful.
+
+## clox
+I did not write a test suite. I've never written a big project in C, so I just pretty much copy-pasted his bytecode VM, which meant I didn't need to worry about testing. Most likely at least. Also, I tried to use the test suite included in the repository and couldn't get it to work. If I remember correctly from a few months ago, there were issues with Dart, and possibly dependencies.

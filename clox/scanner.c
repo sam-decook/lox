@@ -4,6 +4,12 @@
 #include "common.h"
 #include "scanner.h"
 
+typedef struct {
+    const char* start;
+    const char* current;
+    int line;
+} Scanner;
+
 Scanner scanner;
 
 void initScanner(const char* source) {
@@ -99,7 +105,8 @@ static TokenType checkKeyword(int start, int length, const char* rest, TokenType
     return TOKEN_IDENTIFIER;
 }
 
-static TokenType identiferType() {
+static TokenType identifierType() {
+
     switch (scanner.start[0]) {
         case 'a': return checkKeyword(1, 2, "nd",    TOKEN_AND);
         case 'c': return checkKeyword(1, 4, "lass",  TOKEN_CLASS);
@@ -112,6 +119,7 @@ static TokenType identiferType() {
                     case 'u': return checkKeyword(2, 1, "n",   TOKEN_FUN);
                 }
             }
+            break;
         case 'i': return checkKeyword(1, 1, "f",     TOKEN_IF);
         case 'n': return checkKeyword(1, 2, "il",    TOKEN_NIL);
         case 'o': return checkKeyword(1, 1, "r",     TOKEN_OR);
@@ -125,6 +133,7 @@ static TokenType identiferType() {
                     case 'r': return checkKeyword(2, 2, "ue", TOKEN_TRUE);
                 }
             }
+            break;
         case 'v': return checkKeyword(1, 2, "ar",    TOKEN_VAR);
         case 'w': return checkKeyword(1, 4, "hile",  TOKEN_WHILE);
     }
@@ -133,7 +142,7 @@ static TokenType identiferType() {
 
 static Token identifier() {
     while (isAlpha(peek()) || isDigit(peek())) advance();
-    return makeToken(identiferType());
+    return makeToken(identifierType());
 }
 
 static Token number() {
@@ -185,17 +194,13 @@ Token scanToken() {
         case '/': return makeToken(TOKEN_SLASH);
         case '*': return makeToken(TOKEN_STAR);
         case '!':
-          return makeToken(
-              match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+          return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=':
-          return makeToken(
-              match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+          return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '<':
-          return makeToken(
-              match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+          return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>':
-          return makeToken(
-              match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+          return makeToken(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
         case '"': return string();
     }
 

@@ -58,7 +58,8 @@ static void runFile(const char* path) {
     if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char* argv[]) {
+
     initVM();
 
     if (argc == 1) {

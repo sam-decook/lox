@@ -388,7 +388,7 @@ static void declareVariable() {
         }
 
         if (identifiersEqual(name, &local->name)) {
-            error("Already a variable with this name in this scope");
+            error("Already a variable with this name in this scope.");
         }
     }
 
@@ -491,7 +491,7 @@ static void function(FunctionType type) {
             if (current->function->arity > 255) {
                 errorAtCurrent("Can't have more than 255 parameters.");
             }
-            uint8_t constant = parseVariable("Expect parameter name");
+            uint8_t constant = parseVariable("Expect parameter name.");
             defineVariable(constant);
         } while (match(TOKEN_COMMA));
     }
@@ -510,7 +510,7 @@ static void function(FunctionType type) {
 }
 
 static void method() {
-    consume(TOKEN_IDENTIFIER, "Expect method name");
+    consume(TOKEN_IDENTIFIER, "Expect method name.");
     uint8_t constant = identifierConstant(&parser.previous);
 
     FunctionType type = TYPE_METHOD;
@@ -679,7 +679,7 @@ static void returnStatement() {
         }
 
         expression();
-        consume(TOKEN_SEMICOLON, "Expect ';' after return value");
+        consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
         emitByte(OP_RETURN);
     }
 }
@@ -688,7 +688,7 @@ static void whileStatement() {
     int loopStart = currentChunk()->count;
     consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
     expression();
-    consume(TOKEN_RIGHT_BRACE, "Expect ')' after condition.");
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
 
     int exitJump = emitJump(OP_JUMP_IF_FALSE);
     emitByte(OP_POP);
@@ -821,7 +821,7 @@ static void string(bool canAssign) {
 
 static void this_(bool canAssign) {
     if (currentClass == NULL) {
-        error("Can't use 'this' outside of a class");
+        error("Can't use 'this' outside of a class.");
         return;
     }
 
@@ -832,15 +832,13 @@ static void this_(bool canAssign) {
 static void unary(bool canAssign) {
     TokenType operatorType = parser.previous.type;
 
-    // Compile the operand
+    // Compile the operand.
     parsePrecedence(PREC_UNARY);
 
-    // Emit the operator instruction
+    // Emit the operator instruction.
     switch (operatorType) {
-        case TOKEN_BANG: emitByte(OP_NOT); break;
-        case TOKEN_MINUS:
-            emitByte(OP_NEGATE);
-            break;
+        case TOKEN_BANG:  emitByte(OP_NOT); break;
+        case TOKEN_MINUS: emitByte(OP_NEGATE); break;
         default: return; //unreachable
     }
 }
@@ -892,7 +890,7 @@ static void literal(bool canAssign) {
         case TOKEN_FALSE: emitByte(OP_FALSE); break;
         case TOKEN_TRUE:  emitByte(OP_TRUE); break;
         case TOKEN_NIL:   emitByte(OP_NIL); break;
-        default: return; //unreachable
+        default: return;  //unreachable
     }
 }
 
@@ -931,7 +929,7 @@ ParseRule rules[] = {
   [TOKEN_PRINT]         = {NULL,      NULL,    PREC_NONE},
   [TOKEN_RETURN]        = {NULL,      NULL,    PREC_NONE},
   [TOKEN_SUPER]         = {super_,    NULL,    PREC_NONE},
-  [TOKEN_THIS]          = {this_,     NULL,    PREC_NONE}, //underscore to support compiling as C++
+  [TOKEN_THIS]          = {this_,     NULL,    PREC_NONE},
   [TOKEN_TRUE]          = {literal,   NULL,    PREC_NONE},
   [TOKEN_VAR]           = {NULL,      NULL,    PREC_NONE},
   [TOKEN_WHILE]         = {NULL,      NULL,    PREC_NONE},

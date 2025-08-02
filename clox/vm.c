@@ -105,7 +105,7 @@ static bool call(ObjClosure* closure, int argCount) {
     }
 
     if (vm.frameCount == FRAMES_MAX) {
-        runtimeError("Stack overflow");
+        runtimeError("Stack overflow.");
         return false;
     }
 

@@ -156,7 +156,7 @@ static void emitLoop(int loopStart) {
 
     int offset = currentChunk()->count - loopStart + 2;
     // +2 to adjust for the bytes of the loop instuction's offset
-    if (offset > UINT16_MAX) error("Loop body is too large.");
+    if (offset > UINT16_MAX) error("Loop body too large.");
 
     emitByte((offset >> 8) & 0xff);
     emitByte(offset & 0xff);
@@ -426,7 +426,7 @@ static uint8_t argumentList() {
         do {
             expression();
             if (argCount == 255) {
-                error("Can't have more than 255 arguments");
+                error("Can't have more than 255 arguments.");
             }
             argCount++;
         } while (match(TOKEN_COMMA));
@@ -558,7 +558,7 @@ static Token syntheticToken(const char* text) {
 
 static void super_(bool canAssign) {
     if (currentClass == NULL) {
-        error("Can't use 'super' outside of a class");
+        error("Can't use 'super' outside of a class.");
     } else if (!currentClass->hasSuperclass) {
         error("Can't use 'super' in a class with no superclass.");
     }
@@ -634,7 +634,7 @@ static void funDeclaration() {
 }
 
 static void varDeclaration() {
-    uint8_t global = parseVariable("Expect variable name");
+    uint8_t global = parseVariable("Expect variable name.");
 
     if (match(TOKEN_EQUAL)) {
         expression();

@@ -26,3 +26,4 @@ go.work.sum
 
 .idea
 clox_interpreter
+test-lox

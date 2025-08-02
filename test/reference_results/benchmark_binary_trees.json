@@ -1,6 +1,0 @@
-{
-  "stdout": "stretch tree of depth:\n15\ncheck:\n-1\nnum trees:\n32768\ndepth:\n4\ncheck:\n-32768\nnum trees:\n8192\ndepth:\n6\ncheck:\n-8192\nnum trees:\n2048\ndepth:\n8\ncheck:\n-2048\nnum trees:\n512\ndepth:\n10\ncheck:\n-512\nnum trees:\n128\ndepth:\n12\ncheck:\n-128\nnum trees:\n32\ndepth:\n14\ncheck:\n-32\nlong lived tree of depth:\n14\ncheck:\n-1\nelapsed:\n0.878414\n",
-  "stderr": "",
-  "exit_code": 0,
-  "duration": 882788750
-}

@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 1] Error at ')': Expect expression.\n[line 1] Error at ',': Expect expression.\n",
-  "exit_code": 65,
-  "duration": 1549500
-}

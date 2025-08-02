@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 102] Error at 'oops': Too many closure variables in function.\n",
-  "exit_code": 65,
-  "duration": 1574500
-}

@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "Undefined variable 'unknown'.\n[line 1] in script\n",
-  "exit_code": 70,
-  "duration": 1489875
-}

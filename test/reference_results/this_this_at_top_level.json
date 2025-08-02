@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 1] Error at 'this': Can't use 'this' outside of a class.\n",
-  "exit_code": 65,
-  "duration": 1432417
-}

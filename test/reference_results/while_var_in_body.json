@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 2] Error at 'var': Expect expression.\n",
-  "exit_code": 65,
-  "duration": 1489125
-}

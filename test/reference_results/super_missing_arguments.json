@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "Expected 2 arguments but got 1.\n[line 9] in foo()\n[line 13] in script\n",
-  "exit_code": 70,
-  "duration": 1539958
-}

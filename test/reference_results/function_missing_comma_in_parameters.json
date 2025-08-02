@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 3] Error at 'c': Expect ')' after parameters.\n[line 4] Error at end: Expect '}' after block.\n",
-  "exit_code": 65,
-  "duration": 1534958
-}

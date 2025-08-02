@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 8] Error at ')': Expect '.' after 'super'.\n",
-  "exit_code": 65,
-  "duration": 1618333
-}

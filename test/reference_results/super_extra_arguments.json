@@ -1,6 +1,0 @@
-{
-  "stdout": "Derived.foo()\n",
-  "stderr": "Expected 2 arguments but got 4.\n[line 10] in foo()\n[line 14] in script\n",
-  "exit_code": 70,
-  "duration": 2324542
-}

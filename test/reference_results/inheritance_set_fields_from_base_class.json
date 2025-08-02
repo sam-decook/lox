@@ -1,6 +1,0 @@
-{
-  "stdout": "foo 1\nfoo 2\nbar 1\nbar 2\nbar 1\nbar 2\n",
-  "stderr": "",
-  "exit_code": 0,
-  "duration": 1552667
-}

@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 1] Error at 'and': Expect expression.\n[line 1] Error at 'else': Expect class name.\n[line 1] Error at 'fun': Expect '(' after 'for'.\n[line 1] Error at 'while': Expect variable name.\n[line 19] Error at end: Expect '(' after 'while'.\n[line 19] Error at end: Expect '}' after block.\n",
-  "exit_code": 65,
-  "duration": 1430375
-}

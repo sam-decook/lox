@@ -1,6 +1,0 @@
-{
-  "stdout": "Derived.bar()\nBase.foo()\n",
-  "stderr": "",
-  "exit_code": 0,
-  "duration": 1493167
-}

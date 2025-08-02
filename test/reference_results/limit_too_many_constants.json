@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "[line 35] Error at '\"oops\"': Too many constants in one chunk.\n",
-  "exit_code": 65,
-  "duration": 1394625
-}

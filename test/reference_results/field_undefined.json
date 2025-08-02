@@ -1,6 +1,0 @@
-{
-  "stdout": "",
-  "stderr": "Undefined property 'bar'.\n[line 4] in script\n",
-  "exit_code": 70,
-  "duration": 1479500
-}

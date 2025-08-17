@@ -18,6 +18,7 @@ type TestCase struct {
 	Name     string
 	Expected *TestResult
 	Actual   *TestResult
+	Percent  float64
 }
 
 type TestResult struct {
@@ -36,6 +37,9 @@ type TestFramework struct {
 	Reference string //command to run the reference implementation
 	Target    string //command to run the implementation being tested
 	Suites    []*TestSuite
+	Total     int
+	Failed    []*TestCase
+	Percent   float64 //percent difference time to run
 }
 
 var (
@@ -47,7 +51,7 @@ func main() {
 
 	tf := TestFramework{
 		Reference: "test/official-clox",
-		Target:    "codecrafters/glox_interpreter run",
+		Target:    "clox/clox_interpreter",
 	}
 
 	tf.collectSuites("test/cases")
@@ -56,6 +60,7 @@ func main() {
 	})
 
 	tf.executeTests()
+	tf.PrintSummary()
 }
 
 /* Collect the tests from the files and directories in test/cases
@@ -137,12 +142,19 @@ func (tf *TestFramework) executeTests() {
 			target := executeTest(tf.Target, testPath)
 			tc.Expected = &expected
 			tc.Actual = &target
+			tc.Percent = float64(expected.Duration.Nanoseconds()) / float64(target.Duration.Nanoseconds()) * 100
 
 			prevFailed = tc.PrintResult(prevFailed)
 
-			prevFailed = suite.Cases[i].PrintResult(prevFailed)
+			tf.Total++
+			tf.Percent += tc.Percent
+			if prevFailed {
+				tf.Failed = append(tf.Failed, tc)
+			}
 		}
 	}
+
+	tf.Percent /= float64(tf.Total)
 }
 
 func executeTest(executable, test string) TestResult {
@@ -195,8 +207,7 @@ func (tc TestCase) summaryVars() (string, bool) {
 		result = color.RedString("failed")
 	}
 
-	percent := float64(tc.Expected.Duration.Nanoseconds()) / float64(tc.Actual.Duration.Nanoseconds()) * 100
-	timing := fmt.Sprintf("%12s %12s %7.2f%%", tc.Expected.Duration, tc.Actual.Duration, percent)
+	timing := fmt.Sprintf("%12s %12s %7.2f%%", tc.Expected.Duration, tc.Actual.Duration, tc.Percent)
 
 	// Spacing works because len("passed") == len("failed")
 	resultSpacing := strings.Repeat(" ", WIDTH-len("  [passed] ")-len(tc.Name)-len(timing))
@@ -243,5 +254,22 @@ func printDiff(expected, actual string) {
 		}
 		spacing := strings.Repeat(" ", spaces)
 		fmt.Printf("%s%s%s\n", expectedLines[i], spacing, actualLines[i])
+	}
+}
+
+func (tf TestFramework) PrintSummary() {
+	fmt.Println()
+	fmt.Println(strings.Repeat("=", WIDTH))
+
+	fmt.Println("Test summary")
+	fmt.Printf("Tests run: %d\n", tf.Total)
+	fmt.Printf("Succeeded: %d\n", tf.Total-len(tf.Failed))
+	fmt.Printf("Failed:    %d\n", len(tf.Failed))
+	fmt.Printf("Average comparative runtime: %7.2f%%\n", tf.Percent)
+
+	fmt.Println()
+	fmt.Println("Failed tests:")
+	for _, tc := range tf.Failed {
+		fmt.Printf("  %s\n", tc.Name)
 	}
 }

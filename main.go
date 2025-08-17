@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/fs"
 	"os"
@@ -37,10 +38,16 @@ type TestFramework struct {
 	Suites    []*TestSuite
 }
 
+var (
+	noFailStderr = flag.Bool("no-fail-stderr", false, "Stderr mis-match is not a failure.")
+)
+
 func main() {
+	flag.Parse()
+
 	tf := TestFramework{
 		Reference: "test/official-clox",
-		Target:    "clox/clox_interpreter",
+		Target:    "codecrafters/glox_interpreter run",
 	}
 
 	tf.collectSuites("test/cases")
@@ -97,7 +104,6 @@ func collectSuite(dir string) *TestSuite {
 const WIDTH = 120
 
 func (tf *TestFramework) executeTests() {
-	prevFailed := false
 	first := true
 
 	for _, suite := range tf.Suites {
@@ -118,17 +124,21 @@ func (tf *TestFramework) executeTests() {
 		spacing := strings.Repeat(" ", (WIDTH)-len(suite.Name)-len(columns))
 		fmt.Printf("%s%s%s\n", suite.Name, spacing, columns)
 
+		prevFailed := false
 		for i, testCase := range suite.Cases {
 			testPath := path.Join("test/cases", suite.Name, testCase.Name)
 			if suite.Name == "Top Level" {
 				testPath = path.Join("test/cases", testCase.Name)
 			}
 
-			expected := executeTest(tf.Reference, testPath)
-			suite.Cases[i].Expected = &expected
+			tc := &suite.Cases[i]
 
+			expected := executeTest(tf.Reference, testPath)
 			target := executeTest(tf.Target, testPath)
-			suite.Cases[i].Actual = &target
+			tc.Expected = &expected
+			tc.Actual = &target
+
+			prevFailed = tc.PrintResult(prevFailed)
 
 			prevFailed = suite.Cases[i].PrintResult(prevFailed)
 		}
@@ -136,7 +146,9 @@ func (tf *TestFramework) executeTests() {
 }
 
 func executeTest(executable, test string) TestResult {
-	cmd := exec.Command(executable, test)
+	command := strings.Fields(executable)
+	command = append(command, test)
+	cmd := exec.Command(command[0], command[1:]...)
 	stdout := strings.Builder{}
 	stderr := strings.Builder{}
 	cmd.Stdout = &stdout
@@ -170,39 +182,54 @@ func executeTest(executable, test string) TestResult {
  * in how long the tested implementation took to run the same test.
  */
 var divider = strings.Repeat("-", WIDTH)
+var headerSpacing = strings.Repeat(" ", (WIDTH/2)-len("Expected stdout"))
 
-func (tc TestCase) PrintResult(prevFailed bool) bool {
-	perc := float64(tc.Expected.Duration.Nanoseconds()) / float64(tc.Actual.Duration.Nanoseconds()) * 100
-	timing := fmt.Sprintf("%12s %12s %7.2f%%", tc.Expected.Duration, tc.Actual.Duration, perc)
+// Creates the summary line and whether the result differes
+func (tc TestCase) summaryVars() (string, bool) {
+	succeeded := tc.Expected.ExitCode == tc.Actual.ExitCode &&
+		tc.Expected.Stdout == tc.Actual.Stdout &&
+		(tc.Expected.Stderr == tc.Actual.Stderr || *noFailStderr)
+
+	result := color.GreenString("passed")
+	if !succeeded {
+		result = color.RedString("failed")
+	}
+
+	percent := float64(tc.Expected.Duration.Nanoseconds()) / float64(tc.Actual.Duration.Nanoseconds()) * 100
+	timing := fmt.Sprintf("%12s %12s %7.2f%%", tc.Expected.Duration, tc.Actual.Duration, percent)
 
 	// Spacing works because len("passed") == len("failed")
-	spacing := strings.Repeat(" ", WIDTH-len("  [passed] ")-len(tc.Name)-len(timing))
+	resultSpacing := strings.Repeat(" ", WIDTH-len("  [passed] ")-len(tc.Name)-len(timing))
 
-	if tc.Expected.ExitCode == tc.Actual.ExitCode &&
-		tc.Expected.Stdout == tc.Actual.Stdout &&
-		tc.Expected.Stderr == tc.Actual.Stderr {
-		fmt.Printf("  [%s] %s%s%s\n", color.GreenString("passed"), tc.Name, spacing, timing)
-		return false
-	}
+	summary := fmt.Sprintf("  [%s] %s%s%s", result, tc.Name, resultSpacing, timing)
+	return summary, !succeeded
+}
 
-	if !prevFailed {
+func (tc TestCase) PrintResult(prevFailed bool) bool {
+	summary, failed := tc.summaryVars()
+
+	if failed && !prevFailed {
+		// Don't print the divider twice for two errors in a row
 		fmt.Println(divider)
 	}
-	fmt.Printf("  [%s] %s%s%s\n", color.RedString("failed"), tc.Name, spacing, timing)
+	fmt.Println(summary)
 
-	errorSpacing := strings.Repeat(" ", (WIDTH/2)-len("Expected stdout"))
 	if tc.Expected.ExitCode != tc.Actual.ExitCode {
 		fmt.Printf("Expected exit code %d, but got %d\n", tc.Expected.ExitCode, tc.Actual.ExitCode)
-	} else if tc.Expected.Stdout != tc.Actual.Stdout {
-		fmt.Printf("Expected stdout%sActual stdout\n", errorSpacing)
+	}
+	if tc.Expected.Stdout != tc.Actual.Stdout {
+		fmt.Printf("Expected stdout%sActual stdout\n", headerSpacing)
 		printDiff(tc.Expected.Stdout, tc.Actual.Stdout)
-	} else if tc.Expected.Stderr != tc.Actual.Stderr {
-		fmt.Printf("Expected stderr%sActual stderr\n", errorSpacing)
+	}
+	if !*noFailStderr && tc.Expected.Stderr != tc.Actual.Stderr {
+		fmt.Printf("Expected stderr%sActual stderr\n", headerSpacing)
 		printDiff(tc.Expected.Stderr, tc.Actual.Stderr)
 	}
 
-	fmt.Println(divider)
-	return true
+	if failed {
+		fmt.Println(divider)
+	}
+	return failed
 }
 
 func printDiff(expected, actual string) {
@@ -210,7 +237,11 @@ func printDiff(expected, actual string) {
 	actualLines := strings.Split(actual, "\n")
 
 	for i := 0; i < len(expectedLines) && i < len(actualLines); i++ {
-		spacing := strings.Repeat(" ", (WIDTH/2)-len(expectedLines[i]))
+		spaces := (WIDTH / 2) - len(expectedLines[i])
+		if spaces < 0 {
+			spaces = 2
+		}
+		spacing := strings.Repeat(" ", spaces)
 		fmt.Printf("%s%s%s\n", expectedLines[i], spacing, actualLines[i])
 	}
 }

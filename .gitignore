@@ -25,5 +25,6 @@ go.work.sum
 .env
 
 .idea
+glox_interpreter
 clox_interpreter
 test-lox

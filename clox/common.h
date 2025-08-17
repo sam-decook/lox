@@ -12,7 +12,7 @@
 
 // Collect garbage whenever a memory action is performed.
 // Terrible for performance, great for catching bugs.
-#define DEBUG_STRESS_GC
+// #define DEBUG_STRESS_GC
 // #define DEBUG_LOG_GC
 
 #define UINT8_COUNT (UINT8_MAX + 1)

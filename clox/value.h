@@ -37,7 +37,7 @@ typedef uint64_t Value;
 
 static inline double valueToNum(Value value) {
     double num;
-    memcpy(&num, &value, sizeof(double));
+    memcpy(&num, &value, sizeof(Value));
     return num;
 }
 

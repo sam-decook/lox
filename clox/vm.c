@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 
-#include "chunk.h"
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
@@ -106,7 +105,7 @@ static bool call(ObjClosure* closure, int argCount) {
     }
 
     if (vm.frameCount == FRAMES_MAX) {
-        runtimeError("Stack overflow");
+        runtimeError("Stack overflow.");
         return false;
     }
 
@@ -406,7 +405,7 @@ static InterpretResult run() {
                     double a = AS_NUMBER(pop());
                     push(NUMBER_VAL(a + b));
                 } else {
-                    runtimeError("Operands must be two numbers or two strings");
+                    runtimeError("Operands must be two numbers or two strings.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 break;

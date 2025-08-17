@@ -9,7 +9,7 @@
     #include "debug.h"
 #endif
 
-#define GC_GROW_HEAP_FACTOR 2
+#define GC_HEAP_GROW_FACTOR 2
 
 // It's easier to keep track of memory when everything goes through one function.
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
@@ -17,10 +17,13 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 
     // Don't collect garbage if we are freeing or shrinking an allocation.
     if (newSize > oldSize) {
-#ifndef DEBUG_STRESS_GC
+#ifdef DEBUG_STRESS_GC
+        collectGarbage();
+#else
         if (vm.bytesAllocated > vm.nextGC)
-#endif
             collectGarbage();
+#endif
+
     }
     if (newSize == 0) {
         free(pointer);
@@ -229,7 +232,7 @@ void collectGarbage() {
     tableRemoveWhite(&vm.strings);
     sweep();
 
-    vm.nextGC = vm.bytesAllocated * GC_GROW_HEAP_FACTOR;
+    vm.nextGC = vm.bytesAllocated * GC_HEAP_GROW_FACTOR;
 
 #ifdef DEBUG_LOG_GC
     printf("-- gc end, collected %zu bytes (from %zu to %zu)",

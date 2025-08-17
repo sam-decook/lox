@@ -89,9 +89,11 @@ bool tableSet(Table* table, ObjString* key, Value value) {
 bool tableDelete(Table* table, ObjString* key) {
     if (table->count == 0) return false;
 
+    // Find the entry.
     Entry* entry = findEntry(table->entries, table->capacity, key);
     if (entry->key == NULL) return false;
 
+    // Place a tombstone in the entry.
     entry->key = NULL;
     entry->value = BOOL_VAL(true);
     return true;
@@ -113,6 +115,7 @@ ObjString* tableFindString(Table* table, const char* chars, int length, uint32_t
     for (;;) {
         Entry* entry = &table->entries[index];
         if (entry->key == NULL) {
+            // Stop if we find an empty non-tombstone entry.
             if (IS_NIL(entry->value)) return NULL;
         } else if (entry->key->length == length &&
                 entry->key->hash == hash &&

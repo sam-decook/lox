@@ -24,12 +24,6 @@ typedef enum {
 } TokenType;
 
 typedef struct {
-  const char* start;
-  const char* current;
-  int line;
-} Scanner;
-
-typedef struct {
     TokenType type;
     const char* start;
     int length;
